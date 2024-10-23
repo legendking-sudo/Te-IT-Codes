@@ -1,0 +1,147 @@
+db.employees.insertOne({
+  "employee_id": 1001,
+  "name": "John Doe",
+  "department": "HR",
+  "position": "Manager",
+  "salary": 50000,
+  "start_date": ISODate("2021-01-15"),
+  "contact": {
+    "phone": "123-456-7890",
+    "email": "john.doe@example.com"
+  }
+});
+
+***batch insertion
+
+db.employees.insertMany([
+  {
+    "employee_id": 1002,
+    "name": "Jane Smith",
+    "department": "IT",
+    "position": "Developer",
+    "salary": 60000,
+    "start_date": ISODate("2022-02-20"),
+    "contact": {
+      "phone": "987-654-3210",
+      "email": "jane.smith@example.com"
+    }
+  },
+  {
+    "employee_id": 1003,
+    "name": "Bob Johnson",
+    "department": "Finance",
+    "position": "Analyst",
+    "salary": 45000,
+    "start_date": ISODate("2020-11-01"),
+    "contact": {
+      "phone": "555-555-5555",
+      "email": "bob.johnson@example.com"
+    }
+  }
+]);
+
+** validator
+
+db.createCollection("employees", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["employee_id", "name", "salary"],
+      properties: {
+        employee_id: {
+          bsonType: "int",
+          description: "must be an integer and is required"
+        },
+        name: {
+          bsonType: "string",
+          description: "must be a string and is required"
+        },
+        salary: {
+          bsonType: "double",
+          minimum: 0,
+          description: "must be a positive number and is required"
+        }
+      }
+    }
+  }
+});
+
+** delete one
+db.employees.deleteOne({ "employee_id": 1002 });
+
+** delete many
+db.employees.deleteMany({ "department": "Finance" });
+
+***replace one 
+
+db.employees.replaceOne(
+  { "employee_id": 1001 },
+  {
+    "employee_id": 1001,
+    "name": "John Doe",
+    "department": "Operations",
+    "position": "Senior Manager",
+    "salary": 55000,
+    "start_date": ISODate("2021-01-15"),
+    "contact": {
+      "phone": "123-456-7890",
+      "email": "john.doe@example.com"
+    }
+  }
+);
+
+** update one
+db.employees.updateOne(
+  { "employee_id": 1001 },
+  { $set: { "salary": 60000, "position": "Operations Head" } }
+);
+
+**upsert
+db.employees.updateOne(
+  { "employee_id": 1005 },
+  {
+    $set: {
+      "name": "Alice Cooper",
+      "department": "Marketing",
+      "position": "Executive",
+      "salary": 40000,
+      "start_date": ISODate("2023-07-12")
+    }
+  },
+  { upsert: true }
+);
+
+***update multiple queries
+
+db.employees.updateMany(
+  { "department": "IT" },
+  { $inc: { "salary": 5000 } }
+);
+
+
+**returning updated document:
+
+db.employees.findOneAndUpdate(
+  { "employee_id": 1005 },
+  { $set: { "position": "Senior Analyst" } },
+  { returnNewDocument: true }
+);
+
+** cursors
+db.employees.find({ "department": "IT" });
+
+db.employees.find().limit(5);
+
+db.employees.find().skip(10).limit(5);
+
+db.employees.find().sort({ "salary": -1 });
+
+db.employees.find({ "department": "IT", "salary": { $gt: 50000 } });
+
+db.employees.find({
+  $or: [
+    { "department": "HR" },
+    { "department": "Finance" }
+  ]
+});
+

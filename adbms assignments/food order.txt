@@ -1,0 +1,72 @@
+// Step 1: Create Dimension Collections for Star Schema
+// Customer Dimension
+db.customer.insertMany([
+  { "CustomerID": 1, "Name": "Alice", "Email": "alice@example.com", "Phone": "123-456-7890", "Address": "123 Main St", "RegistrationDate": new Date("2021-01-01") },
+  { "CustomerID": 2, "Name": "Bob", "Email": "bob@example.com", "Phone": "987-654-3210", "Address": "456 Elm St", "RegistrationDate": new Date("2021-02-01") }
+]);
+
+// Restaurant Dimension
+db.restaurant.insertMany([
+  { "RestaurantID": 1, "RestaurantName": "Pasta House", "CuisineType": "Italian", "Location": "Downtown", "Rating": 4.5 },
+  { "RestaurantID": 2, "RestaurantName": "Curry Palace", "CuisineType": "Indian", "Location": "Uptown", "Rating": 4.0 }
+]);
+
+// Menu Item Dimension
+db.menu_item.insertMany([
+  { "MenuItemID": 1, "MenuItemName": "Spaghetti", "Description": "Classic Italian pasta", "Price": 12.99, "Category": "Main Course" },
+  { "MenuItemID": 2, "MenuItemName": "Butter Chicken", "Description": "Spicy Indian curry", "Price": 14.99, "Category": "Main Course" }
+]);
+
+// Step 2: Create Fact Table for Star Schema
+db.orders.insertMany([
+  { "OrderID": 1, "CustomerID": 1, "RestaurantID": 1, "MenuItemID": 1, "OrderDate": new Date("2021-03-01"), "Quantity": 2, "TotalAmount": 25.98 },
+  { "OrderID": 2, "CustomerID": 2, "RestaurantID": 2, "MenuItemID": 2, "OrderDate": new Date("2021-03-02"), "Quantity": 1, "TotalAmount": 14.99 }
+]);
+
+// Step 3: Create Dimension Collections for Snowflake Schema
+// Address Dimension
+db.address.insertMany([
+  { "AddressID": 1, "Street": "123 Main St", "City": "Metropolis", "State": "NY", "ZipCode": "10001" },
+  { "AddressID": 2, "Street": "456 Elm St", "City": "Gotham", "State": "NY", "ZipCode": "10002" }
+]);
+
+// Update Customer to include AddressID
+db.customer.updateMany(
+  { "CustomerID": 1 }, 
+  { $set: { "AddressID": 1 } }
+);
+db.customer.updateMany(
+  { "CustomerID": 2 }, 
+  { $set: { "AddressID": 2 } }
+);
+
+// Cuisine Type Dimension
+db.cuisine_type.insertMany([
+  { "CuisineTypeID": 1, "CuisineTypeName": "Italian" },
+  { "CuisineTypeID": 2, "CuisineTypeName": "Indian" }
+]);
+
+// Update Restaurant to include CuisineTypeID
+db.restaurant.updateMany(
+  { "RestaurantID": 1 }, 
+  { $set: { "CuisineTypeID": 1 } }
+);
+db.restaurant.updateMany(
+  { "RestaurantID": 2 }, 
+  { $set: { "CuisineTypeID": 2 } }
+);
+
+// Step 4: Create Fact Table for Snowflake Schema
+db.orders_snowflake.insertMany([
+  { "OrderID": 1, "CustomerID": 1, "RestaurantID": 1, "MenuItemID": 1, "OrderDate": new Date("2021-03-01"), "Quantity": 2, "TotalAmount": 25.98 },
+  { "OrderID": 2, "CustomerID": 2, "RestaurantID": 2, "MenuItemID": 2, "OrderDate": new Date("2021-03-02"), "Quantity": 1, "TotalAmount": 14.99 }
+]);
+
+// Step 5: Create Indexes for Optimization
+db.orders.createIndex({ "CustomerID": 1 });
+db.orders.createIndex({ "RestaurantID": 1 });
+db.orders.createIndex({ "MenuItemID": 1 });
+
+db.orders_snowflake.createIndex({ "CustomerID": 1 });
+db.orders_snowflake.createIndex({ "RestaurantID": 1 });
+db.orders_snowflake.createIndex({ "MenuItemID": 1 });

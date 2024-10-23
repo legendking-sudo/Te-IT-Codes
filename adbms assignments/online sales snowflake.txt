@@ -1,0 +1,211 @@
+**********************STAR SCHEMA***********
+
+db.Fact_Sales.insertMany([
+  {
+    "Sales_ID": 1,
+    "Product_ID": 101,
+    "Customer_ID": 1001,
+    "Date_ID": 20231021,
+    "Store_ID": 501,
+    "Quantity_Sold": 3,
+    "Total_Amount": 150.0
+  },
+  {
+    "Sales_ID": 2,
+    "Product_ID": 102,
+    "Customer_ID": 1002,
+    "Date_ID": 20231022,
+    "Store_ID": 502,
+    "Quantity_Sold": 5,
+    "Total_Amount": 250.0
+  }
+])
+
+
+db.Product_Dimension.insertMany([
+  {
+    "Product_ID": 101,
+    "Product_Name": "Laptop",
+    "Category": "Electronics",
+    "Brand": "BrandA",
+    "Price": 500.0
+  },
+  {
+    "Product_ID": 102,
+    "Product_Name": "Smartphone",
+    "Category": "Electronics",
+    "Brand": "BrandB",
+    "Price": 300.0
+  }
+])
+
+db.Customer_Dimension.insertMany([
+  {
+    "Customer_ID": 1001,
+    "Customer_Name": "Alice",
+    "Gender": "Female",
+    "Age": 28,
+    "Location": "New York"
+  },
+  {
+    "Customer_ID": 1002,
+    "Customer_Name": "Bob",
+    "Gender": "Male",
+    "Age": 35,
+    "Location": "San Francisco"
+  }
+])
+
+db.Date_Dimension.insertMany([
+  {
+    "Date_ID": 20231021,
+    "Date": "2023-10-21",
+    "Day": "Saturday",
+    "Month": "October",
+    "Year": 2023
+  },
+  {
+    "Date_ID": 20231022,
+    "Date": "2023-10-22",
+    "Day": "Sunday",
+    "Month": "October",
+    "Year": 2023
+  }
+])
+
+db.Store_Dimension.insertMany([
+  {
+    "Store_ID": 501,
+    "Store_Name": "Store A",
+    "Store_Location": "New York",
+    "Store_Manager": "John Doe"
+  },
+  {
+    "Store_ID": 502,
+    "Store_Name": "Store B",
+    "Store_Location": "San Francisco",
+    "Store_Manager": "Jane Smith"
+  }
+])
+****************SNOWFLAKE
+
+db.Fact_Sales.insertMany([
+  {
+    "Sales_ID": 1,
+    "Product_ID": 101,
+    "Customer_ID": 1001,
+    "Date_ID": 20231021,
+    "Store_ID": 501,
+    "Quantity_Sold": 3,
+    "Total_Amount": 150.0
+  },
+  {
+    "Sales_ID": 2,
+    "Product_ID": 102,
+    "Customer_ID": 1002,
+    "Date_ID": 20231022,
+    "Store_ID": 502,
+    "Quantity_Sold": 5,
+    "Total_Amount": 250.0
+  }
+])
+db.Product_Dimension.insertMany([
+  {
+    "Product_ID": 101,
+    "Product_Name": "Laptop",
+    "Category_ID": 1,
+    "Brand_ID": 1
+  },
+  {
+    "Product_ID": 102,
+    "Product_Name": "Smartphone",
+    "Category_ID": 1,
+    "Brand_ID": 2
+  }
+])
+
+db.Category_Dimension.insertMany([
+  {
+    "Category_ID": 1,
+    "Category_Name": "Electronics"
+  }
+])
+
+
+db.Brand_Dimension.insertMany([
+  {
+    "Brand_ID": 1,
+    "Brand_Name": "BrandA"
+  },
+  {
+    "Brand_ID": 2,
+    "Brand_Name": "BrandB"
+  }
+])
+
+db.Customer_Dimension.insertMany([
+  {
+    "Customer_ID": 1001,
+    "Customer_Name": "Alice",
+    "Gender": "Female",
+    "Location_ID": 1
+  },
+  {
+    "Customer_ID": 1002,
+    "Customer_Name": "Bob",
+    "Gender": "Male",
+    "Location_ID": 2
+  }
+])
+
+db.Location_Dimension.insertMany([
+  {
+    "Location_ID": 1,
+    "City": "New York",
+    "State": "NY",
+    "Country": "USA"
+  },
+  {
+    "Location_ID": 2,
+    "City": "San Francisco",
+    "State": "CA",
+    "Country": "USA"
+  }
+])
+
+db.Date_Dimension.insertMany([
+  {
+    "Date_ID": 20231021,
+    "Date": "2023-10-21",
+    "Day_ID": 1,
+    "Month_ID": 10,
+    "Year_ID": 2023
+  },
+  {
+    "Date_ID": 20231022,
+    "Date": "2023-10-22",
+    "Day_ID": 2,
+    "Month_ID": 10,
+    "Year_ID": 2023
+  }
+])
+
+db.Fact_Sales.aggregate([
+  {
+    $lookup: {
+      from: "Product_Dimension",
+      localField: "Product_ID",
+      foreignField: "Product_ID",
+      as: "Product_Details"
+    }
+  },
+  {
+    $lookup: {
+      from: "Customer_Dimension",
+      localField: "Customer_ID",
+      foreignField: "Customer_ID",
+      as: "Customer_Details"
+    }
+  }
+])
+

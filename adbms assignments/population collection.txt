@@ -1,0 +1,111 @@
+// Step 1: Create the Population collection and insert data
+db.population.insertMany([
+  { "CountryID": 1, "StateID": 101, "City": "CityA", "Year": 2020, "Population": 500000 },
+  { "CountryID": 1, "StateID": 101, "City": "CityA", "Year": 2021, "Population": 520000 },
+  { "CountryID": 1, "StateID": 102, "City": "CityB", "Year": 2020, "Population": 300000 },
+  { "CountryID": 1, "StateID": 102, "City": "CityB", "Year": 2021, "Population": 310000 },
+  { "CountryID": 2, "StateID": 201, "City": "CityC", "Year": 2020, "Population": 700000 },
+  { "CountryID": 2, "StateID": 202, "City": "CityD", "Year": 2020, "Population": 800000 },
+  { "CountryID": 2, "StateID": 202, "City": "CityD", "Year": 2021, "Population": 850000 }
+]);
+
+// Step 2: Aggregation Queries
+// 1. Sum: Calculate total population by year
+db.population.aggregate([
+  {
+    $group: {
+      _id: "$Year",
+      totalPopulation: { $sum: "$Population" }
+    }
+  }
+]);
+
+// 2. Min: Find the minimum population in each city
+db.population.aggregate([
+  {
+    $group: {
+      _id: "$City",
+      minPopulation: { $min: "$Population" }
+    }
+  }
+]);
+
+// 3. Max: Find the maximum population in each country
+db.population.aggregate([
+  {
+    $group: {
+      _id: "$CountryID",
+      maxPopulation: { $max: "$Population" }
+    }
+  }
+]);
+
+// 4. Avg: Calculate average population for each city
+db.population.aggregate([
+  {
+    $group: {
+      _id: "$City",
+      avgPopulation: { $avg: "$Population" }
+    }
+  }
+]);
+
+// 5. Count: Count the number of population records for each city
+db.population.aggregate([
+  {
+    $group: {
+      _id: "$City",
+      countRecords: { $count: {} }
+    }
+  }
+]);
+
+// 6. First: Get the first recorded population for each city
+db.population.aggregate([
+  {
+    $group: {
+      _id: "$City",
+      firstPopulation: { $first: "$Population" }
+    }
+  }
+]);
+
+// 7. Last: Get the last recorded population for each city
+db.population.aggregate([
+  {
+    $group: {
+      _id: "$City",
+      lastPopulation: { $last: "$Population" }
+    }
+  }
+]);
+
+// 8. Push: Get all populations for each city (as an array)
+db.population.aggregate([
+  {
+    $group: {
+      _id: "$City",
+      populations: { $push: "$Population" }
+    }
+  }
+]);
+
+// 9. addToSet: Get unique populations for each state
+db.population.aggregate([
+  {
+    $group: {
+      _id: "$StateID",
+      uniquePopulations: { $addToSet: "$Population" }
+    }
+  }
+]);
+
+// Step 3: Indexing
+// Create an index on CountryID
+db.population.createIndex({ "CountryID": 1 });
+
+// Create a compound index on StateID and City
+db.population.createIndex({ "StateID": 1, "City": 1 });
+
+// Create an index on Population in descending order
+db.population.createIndex({ "Population": -1 });

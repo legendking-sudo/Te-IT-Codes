@@ -1,0 +1,93 @@
+// Insert Books into the "books" collection
+db.books.insertMany([
+  {
+    "book_id": 1,
+    "title": "The Catcher in the Rye",
+    "author": "J.D. Salinger",
+    "published_year": 1951,
+    "available": true,
+    "keywords": ["classic", "coming-of-age", "literature"]
+  },
+  {
+    "book_id": 2,
+    "title": "Pride and Prejudice",
+    "author": "Jane Austen",
+    "published_year": 1813,
+    "available": false,
+    "keywords": ["romance", "classic", "British"]
+  },
+  {
+    "book_id": 3,
+    "title": "The Lord of the Rings",
+    "author": "J.R.R. Tolkien",
+    "published_year": 1954,
+    "available": true,
+    "keywords": ["fantasy", "epic", "adventure"]
+  }
+]);
+
+// Insert Members into the "members" collection
+db.members.insertMany([
+  {
+    "member_id": 1001,
+    "name": "Alice",
+    "email": "alice@example.com",
+    "membership_start": ISODate("2020-01-15"),
+    "membership_end": ISODate("2024-01-15")
+  },
+  {
+    "member_id": 1002,
+    "name": "Bob",
+    "email": null,
+    "membership_start": ISODate("2019-06-10"),
+    "membership_end": ISODate("2023-06-10")
+  }
+]);
+
+// Insert Loans into the "loans" collection
+db.loans.insertMany([
+  {
+    "loan_id": 1,
+    "book_id": 2,
+    "member_id": 1001,
+    "loan_date": ISODate("2023-09-10"),
+    "return_date": ISODate("2023-09-30")
+  }
+]);
+
+// Queries
+
+// 1. Find all books
+db.books.find();
+
+// 2. Find one specific book (Pride and Prejudice)
+db.books.findOne({ "title": "Pride and Prejudice" });
+
+// 3. Find books published after 1900
+db.books.find({ "published_year": { $gt: 1900 } });
+
+// 4. Find books that are either in the fantasy genre or published before 1900
+db.books.find({
+  $or: [
+    { "keywords": "fantasy" },
+    { "published_year": { $lt: 1900 } }
+  ]
+});
+
+// 5. Find books that are not available (checked out)
+db.books.find({ "available": { $not: { $eq: true } } });
+
+// 6. Find members with no email (null)
+db.members.find({ "email": null });
+
+// 7. Find books with 'Lord' in the title (case-insensitive)
+db.books.find({ "title": { $regex: /lord/i } });
+
+// 8. Find books that contain the keyword 'classic'
+db.books.find({ "keywords": "classic" });
+
+// 9. Use $where to find books with title length greater than 15 characters
+db.books.find({ $where: "this.title.length > 15" });
+
+// 10. Find all loans for member 'Alice' (member_id: 1001)
+db.loans.find({ "member_id": 1001 });
