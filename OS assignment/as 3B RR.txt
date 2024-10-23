@@ -1,0 +1,59 @@
+#include<stdio.h>
+int main() {
+    int wt[10] = {0}, at[10], bt[10], temp[10], tat[10] = {0};
+    double twt = 0, ttat = 0, awt, atat;
+    int i, p, quant, rm, time = 0;
+    
+    printf("Enter the number of processes: ");
+    scanf("%d", &p);
+    printf("Enter the arrival and burst time of processes: \n");
+    for(i = 0; i < p; i++) {
+        printf("Arrival time for process %d: ", i + 1);
+        scanf("%d", &at[i]);
+        printf("Burst time of process %d: ", i + 1);
+        scanf("%d", &bt[i]);
+        temp[i] = bt[i];  // Storing burst time in temp array
+    }
+
+    printf("Enter the quantum value: ");
+    scanf("%d", &quant);
+    
+    rm = p;  // Remaining processes
+    i = 0;   // Initialize index
+
+    // Time slice for Round Robin
+    while (rm != 0) {
+        if (at[i] <= time && temp[i] > 0) {  // Check if process is ready to execute
+            if (temp[i] <= quant) {  // Process can complete within time quantum
+                time += temp[i];
+                temp[i] = 0;  // Process is finished
+                rm--;  // One less remaining process
+                
+                // Calculate waiting time and turnaround time
+                wt[i] = time - at[i] - bt[i];  // Waiting time
+                tat[i] = time - at[i];  // Turnaround time
+                
+                twt += wt[i];  // Total waiting time
+                ttat += tat[i];  // Total turnaround time
+            } else {  // Process can't complete within time quantum
+                time += quant;  // Increase time by quantum
+                temp[i] -= quant;  // Reduce remaining burst time
+            }
+        }
+        i = (i + 1) % p;  // Move to next process
+    }
+    
+    // Print process details
+    printf("\nProcess\tArrival Time\tBurst Time\tWaiting Time\tTurnaround Time\n");
+    for (i = 0; i < p; i++) {
+        printf("%d\t\t%d\t\t%d\t\t%d\t\t%d\n", i + 1, at[i], bt[i], wt[i], tat[i]);
+    }
+
+    // Calculate and display average waiting and turnaround times
+    awt = twt / p;
+    atat = ttat / p;
+    printf("\nAverage Waiting Time: %.2lf", awt);
+    printf("\nAverage Turnaround Time: %.2lf\n", atat);
+
+    return 0;
+}
