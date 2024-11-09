@@ -34,7 +34,7 @@ void mergeSort(int arr[], int l, int r) {
 int main() {
     int size, arr[20];
     char *p[25], buff[20];
-
+    printf("===========DEmonstartion of execv=======\n")
     printf("Enter size of array: ");
     scanf("%d", &size);
     printf("Enter array elements: ");
