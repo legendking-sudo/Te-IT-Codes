@@ -44,5 +44,5 @@ int main(int argc, char *argv[]) {
         printf("Element not found\n");
     }
 
-    return 0;
+    return 0;
 }
