@@ -898,28 +898,35 @@ int main(){
 
 Client:-
 
-#include<stdio.h>
-#include<string.h>
-#include<fcntl.h>
 #include<unistd.h>
-#define FIFO_PIPE "xyz"
+#include<stdlib.h>
+#include<stdio.h>
+#include <string.h>
+#include <sys/shm.h>
+#include "shm_com.h"
 int main()
 {
-	int fd, i=0;
-	char str[200],ch;
-	mkfifo(FIFO_PIPE, 0644);    // Pipe created	
-	printf("\n Pipe Successfully created \n");
-	printf("\n Enter Your message (press @ to terminate) \n");
-	while((ch=fgetc(stdin)) != '@')
+	void *shared_memory = (void *)0;
+	struct shared_m *shared_stuff;
+	int shmid;
+	char buffer[2048];
+	shmid = shmget((key_t)1234, sizeof(struct shared_m), 0666);
+	shared_memory = shmat(shmid, (void *)0, 0);
+	shared_stuff = (struct shared_m *)shared_memory;
+	shared_stuff->flag = 0;
+	while(1)
 	{
-		str[i++] = ch;
+		if (shared_stuff->flag)
+		{
+			printf("You wrote: %s", shared_stuff->text);
+    		shared_stuff->flag = 0;
+			if (strncmp(shared_stuff->text, "end", 3) == 0) 
+    			exit(0);
+		}
 	}
-	str[i]='\0'; // Null character at the end 
-	fd=open(FIFO_PIPE,O_WRONLY); // Open the pipe
-	write(fd, str, strlen(str)); // write into the pipe
-	close(fd);
-	return 0;
+
 }
+
 
 
 Server:-
