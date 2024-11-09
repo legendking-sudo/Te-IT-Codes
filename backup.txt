@@ -1,0 +1,1217 @@
+-----------------------------------------------------------------------------------------Assignment 1(Employer Database) ----------------------------------------------------------------------------------------------------------
+
+
+while true
+do
+    echo -e "1.CREATE \n2.VIEW \n3.INSERT \n4.DELETE \n5.MODIFY \n6.EXIT"
+    echo "Enter your choice:"
+    read choice
+    
+    case $choice in
+        1)
+            if [ -f emp.txt ]
+            then
+                echo "File already present"
+            else
+                touch emp.txt
+                echo "File created successfully"
+            fi;;
+        
+        2)
+            if [ -s emp.txt ]
+            then
+                cat emp.txt
+            else
+                echo "File is empty"
+            fi;;
+
+        3)
+            read -p "Enter empid: " empid
+            read -p "Enter employee name: " name
+            read -p "Enter phone number: " phone
+            echo "$empid $name $phone" >> emp.txt
+            echo "Record inserted successfully";;
+        
+        4)
+            read -p "Enter the empid you want to delete: " empid
+            grep -w "$empid" emp.txt > temp
+            if [ -s temp ]
+            then
+                grep -v "$empid" emp.txt > temp
+                mv temp emp.txt
+                echo "Record deleted successfully"
+            else
+                echo "Record not found"
+            fi;;
+
+        5)
+            read -p "Enter the empid you want to modify: " empid
+            grep -w "$empid" emp.txt > temp
+            if [ -s temp ]
+            then
+                grep -v "$empid" emp.txt > temp
+                mv temp emp.txt
+                read -p "New name: " name
+                read -p "New phone number: " phone
+                echo "$empid $name $phone" >> emp.txt
+                echo "Record modified successfully"
+            else
+                echo "Record not found" 
+            fi;;
+
+        6)
+            exit;;
+
+        *)
+            echo "You entered an invalid choice";;
+    esac
+done
+
+
+-----------------------------------------------------------------------------------------Assignment 1(Student Database) ----------------------------------------------------------------------------------------------------------
+
+
+while true 
+do
+    echo "Student Database"
+    echo "1.CREATE 2.INSERT 3.DISPLAY 4. SEARCH 5.DELETE 6.UPDATE 7. EXIT"
+    echo "Enter the Choice"
+    read choice
+
+    case $choice in 
+        1) 
+            if [ -f student.txt ]
+            then 
+                echo "File Already Present"     
+            else
+                touch student.txt
+                echo "File Created Successfully"
+            fi;;           
+        2) 
+            read -p "Enter the Regno:" regno
+            read -p "Enter the Name:" name
+            read -p "Enter the Mobile:" mobile
+            echo $regno $name $mobile >> student.txt
+            echo "Record Inserted Successfully";;    
+        3) 
+            echo "1. All records 2.Top Records 3. Bottom Records"
+            read ch
+            if [ $ch -eq 1 ]
+            then 
+                cat student.txt
+            elif [ $ch -eq 2 ] 
+            then 
+                head -5 student.txt
+            elif [ $ch -eq 3 ]
+            then
+                tail -5 student.txt
+            fi;;
+        4) 
+            read -p "Enter the Regno:" regno 
+            grep -w $regno student.txt > temp
+            if [ -s temp ] 
+            then
+                echo "Record Present"
+                grep -w $regno student.txt
+            else
+                echo "Record Not Present"
+            fi;;    
+        5) 
+            read -p "Enter the Regno:" regno 
+            grep -w $regno student.txt > temp
+            if [ -s temp ] 
+            then
+                grep -v $regno student.txt > temp
+                echo "Record Deleted"
+                mv temp student.txt
+            else
+                echo "Record Not Present"
+            fi;;
+        6)  
+            read -p "Enter the Regno:" regno 
+            grep -w $regno student.txt > temp
+            if [ -s temp ] 
+            then
+                grep -v $regno student.txt > temp
+                mv temp student.txt
+                read -p "Enter the Name:" name
+                read -p "Enter the Mobile:" mobile
+                echo $regno $name $mobile >> student.txt
+                echo "Record Updated Successfully"
+            else
+                echo "Record Not Present"
+            fi;;   
+        7) 
+            exit ;;  # Exit the script
+        *) 
+            echo "Invalid Choice";;
+    esac    
+done
+
+
+
+
+-----------------------------------------------------------------------------------------Assignment 2a (Wait Fork) ----------------------------------------------------------------------------------------------------------
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
+// Comparison function for qsort
+int compare(const void *a, const void *b) {
+    return (*(int *)a - *(int *)b);
+}
+
+void printArray(int arr[], int size) {
+    for (int i = 0; i < size; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int size;
+    int arr[20];
+
+    printf("Enter size of array: ");
+    scanf("%d", &size);
+
+    printf("Enter array elements: ");
+    for (int i = 0; i < size; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    pid_t pid = fork();
+
+    if (pid < 0) {
+        // Fork failed
+        perror("Fork failed");
+        exit(1);
+    } else if (pid == 0) {
+        // Child process
+        printf("\nChild Process (PID: %d): Sorting the array...\n", getpid());
+        qsort(arr, size, sizeof(int), compare);
+        printf("Sorted array by child process: ");
+        printArray(arr, size);
+        sleep(5);  // Sleep to demonstrate orphan state
+        exit(0);
+    } else {
+        // Parent process
+        printf("\nParent Process (PID: %d): Sorting the array...\n", getpid());
+        qsort(arr, size, sizeof(int), compare);
+        printf("Sorted array by parent process: ");
+        printArray(arr, size);
+
+        // Wait for the child process to complete
+        wait(NULL);
+        printf("\nChild process has completed.\n");
+
+        // Sleep to demonstrate zombie state (if wait was not called)
+        sleep(10);
+    }
+
+    return 0;
+}
+
+
+
+-----------------------------------------------------------------------------------------Assignment 2B(Process Control System) ----------------------------------------------------------------------------------------------------------
+
+    
+
+
+
+CHILD PROCESS:
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int binary_search(int ar[],int start ,int end, int key)
+{
+	if(start < end)
+	{
+		int mid = (start+end)/2;
+		if(key == ar[mid])
+			return mid ;
+		else if(key < ar[mid])
+			return binary_search(ar,start,mid,key);
+		else
+			return binary_search(ar,mid+1,end,key);
+	}
+	if( (key < 0) || (key > end) )
+		return -1;
+	return -1;
+}
+
+int main(int argc, char *argv[]){
+
+	int arr[20], size = 0,result, key;
+	printf("%s\n", "===== Binary Search by Child Process =====");
+	for(int i = 0 ; argv[i+1] != 0 ; i++){
+		arr[i] = atoi(argv[i+1]);
+		size++;
+	}
+
+	printf("%s\n", "Sorted Array: ");
+	for(int i = 0 ; i < size ; i++){
+		printf("%d\t", arr[i]);
+	}
+
+	printf("\n%s", "Number to search: " );
+	scanf("%d", &key);
+
+	result = binary_search(arr, 0, size, key);
+
+	if(result == -1)
+		printf("%s\n", "Number not Found" );
+	else{
+		printf("Element found at %d location\n", result+1);
+	}
+
+	return 0;
+}
+
+
+
+
+PARENT PROCESS:
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+void merge(int arr[], int l, int m, int r)
+{
+    int i, j, k;
+    int n1 = m - l + 1;
+    int n2 =  r - m;
+    int L[n1], R[n2];
+    for (i = 0; i < n1; i++)
+        L[i] = arr[l + i];
+    for (j = 0; j < n2; j++)
+        R[j] = arr[m + 1+ j];
+ 
+   
+    i = 0; 
+    j = 0;
+    k = l; 
+    while (i < n1 && j < n2)
+    {
+        if (L[i] <= R[j])
+        {
+            arr[k] = L[i];
+            i++;
+        }
+        else
+        {
+            arr[k] = R[j];
+            j++;
+        }
+        k++;
+    }
+    while (i < n1)
+    {
+        arr[k] = L[i];
+        i++;
+        k++;
+    }
+    while (j < n2)
+    {
+        arr[k] = R[j];
+        j++;
+        k++;
+    }
+}
+
+void mergeSort(int arr[], int l, int r)
+{
+    if (l < r)
+    {
+
+        int m = l+(r-l)/2;
+        mergeSort(arr, l, m);
+        mergeSort(arr, m+1, r);
+		merge(arr, l, m, r);
+    }
+}
+
+void displayArray(int arr[], int size){
+	for(int i = 0 ; i < size ; i++){
+		printf("%d\t", arr[i]);
+	}
+	printf("\n");
+}
+
+int main(){
+
+	int size, arr[20];
+	char *p[25],buff[20];
+
+	system("clear");
+	printf("======== Demonstration of EXECV ========\n");
+	//taking array input from user
+	printf("Enter size of array: ");
+	scanf("%d", &size);
+	printf("Array elements: ");
+	for(int i = 0 ; i < size ; i++){
+		scanf("%d", &arr[i]);
+	}   
+
+	mergeSort(arr, 0, size-1);
+
+    for(int i = 0 ; i < size ; i++)
+    {
+        snprintf(buff,20,"%d",arr[i]);
+        p[i+1]=strdup(buff);
+    }
+    p[0]=(char*)malloc(20);
+    strcpy(p[0],"childprocess");
+    p[size+1] = 0;
+  
+    printf("\nSorted Array is: \n");
+    displayArray(arr, size);
+
+    execv("./childprocess",p); 
+
+    return 0;
+}
+
+
+
+
+
+
+
+-----------------------------------------------------------------------------------------Assignment 3A(PREEMPTIVE)(SJF-p) ----------------------------------------------------------------------------------------------------------
+
+
+#include<stdio.h>
+
+int main() {
+    int at[10], bt[10], temp[10];
+    int wt[10], tt[10];  // Arrays for waiting time and turnaround time
+    int i, sml, cnt = 0, t = 0, p;
+    double total_wt = 0, total_tt = 0;
+    float avg_wt, avg_tt;
+    
+    printf("Enter the total number of processes: ");
+    scanf("%d", &p);
+
+    // Input Arrival Time and Burst Time
+    for(i = 0; i < p; i++) {
+        printf("Enter arrival time for process %d: ", i + 1);
+        scanf("%d", &at[i]);
+        printf("Enter burst time for process %d: ", i + 1);
+        scanf("%d", &bt[i]);
+        temp[i] = bt[i];  // Copy burst time to temp array
+    }
+
+    bt[9] = 9999;  // Set a high burst time for comparison
+
+    for(t = 0; cnt != p; t++) {
+        sml = 9;  // Initialize to the process with the largest burst time
+        
+        for(i = 0; i < p; i++) {
+            if(at[i] <= t && bt[i] < bt[sml] && bt[i] > 0) {
+                sml = i;  // Find the process with the smallest burst time
+            }
+        }
+
+        bt[sml]--;  // Decrease burst time
+
+        // Process completes execution
+        if(bt[sml] == 0) {
+            cnt++;  // Increment the completed process count
+            int end = t + 1;
+            wt[sml] = end - at[sml] - temp[sml];  // Calculate waiting time
+            tt[sml] = end - at[sml];  // Calculate turnaround time
+            total_wt += wt[sml];
+            total_tt += tt[sml];
+        }
+    }
+
+    // Print the table with process information
+    printf("\nProcess\tBurst Time\tArrival Time\tWaiting Time\tTurnaround Time\n");
+    for (i = 0; i < p; i++) {
+        printf("%d\t%d\t\t%d\t\t%d\t\t%d\n", i + 1, temp[i], at[i], wt[i], tt[i]);
+    }
+
+    avg_wt = total_wt / p;  // Calculate average waiting time
+    avg_tt = total_tt / p;  // Calculate average turnaround time
+
+    printf("\nAverage Waiting Time: %.2f", avg_wt);
+    printf("\nAverage Turnaround Time: %.2f\n", avg_tt);
+
+    return 0;
+}
+
+
+-----------------------------------------------------------------------------------------Assignment 3A(Non Preemptive)---------------------------------------------------------------------------------------------------------
+
+
+#include <stdio.h>
+int main()
+{
+	// Matrix for storing Process Id, Burst
+	// Time, Average Waiting Time & Average
+	// Turn Around Time.
+	int A[100][4];
+	int i, j, n, total = 0, index, temp;
+	float avg_wt, avg_tat;
+	printf("Enter number of process: ");
+	scanf("%d", &n);
+	printf("Enter Burst Time:\n");
+	// User Input Burst Time and alloting Process Id.
+	for (i = 0; i < n; i++) {
+		printf("P%d: ", i + 1);
+		scanf("%d", &A[i][1]);
+		A[i][0] = i + 1;
+	}
+	// Sorting process according to their Burst Time.
+	for (i = 0; i < n; i++) {
+		index = i;
+		for (j = i + 1; j < n; j++)
+			if (A[j][1] < A[index][1])
+				index = j;
+		temp = A[i][1];
+		A[i][1] = A[index][1];
+		A[index][1] = temp;
+
+		temp = A[i][0];
+		A[i][0] = A[index][0];
+		A[index][0] = temp;
+	}
+	A[0][2] = 0;
+	// Calculation of Waiting Times
+	for (i = 1; i < n; i++) {
+		A[i][2] = 0;
+		for (j = 0; j < i; j++)
+			A[i][2] += A[j][1];
+		total += A[i][2];
+	}
+	avg_wt = (float)total / n;
+	total = 0;
+	printf("P	 BT	 WT	 TAT\n");
+	// Calculation of Turn Around Time and printing the
+	// data.
+	for (i = 0; i < n; i++) {
+		A[i][3] = A[i][1] + A[i][2];
+		total += A[i][3];
+		printf("P%d	 %d	 %d	 %d\n", A[i][0],
+			A[i][1], A[i][2], A[i][3]);
+	}
+	avg_tat = (float)total / n;
+	printf("Average Waiting Time= %f", avg_wt);
+	printf("\nAverage Turnaround Time= %f", avg_tat);
+}
+
+
+
+
+-----------------------------------------------------------------------------------------Assignment 3B(Round Robin) --------------------------------------------------------------------------------------------------------------
+
+#include<stdio.h>  
+void main()  
+{  
+    int i, NOP, sum=0,count=0, y, quant, wt=0, tat=0, at[10], bt[10], temp[10];  
+    float avg_wt, avg_tat;  
+    printf(" Total number of process in the system: ");  
+    scanf("%d", &NOP);  
+    y = NOP; 
+    for(i=0; i<NOP; i++)  
+    {  
+        printf("\n Enter the Arrival and Burst time of the Process[%d]\n", i+1);  
+        printf(" Arrival time is: \t");  
+        scanf("%d", &at[i]);  
+        printf(" \nBurst time is: \t");  
+        scanf("%d", &bt[i]);  
+        temp[i] = bt[i]; 
+    }  
+    printf("Enter the Time Quantum for the process: \t");  
+    scanf("%d", &quant);  
+
+    printf("\n Process No \t\t Burst Time \t\t TAT \t\t Waiting Time ");  
+    for(sum=0, i = 0; y!=0; )  
+    {  
+        if(temp[i] <= quant && temp[i] > 0) // define the conditions   
+        {  
+            sum = sum + temp[i];  
+            temp[i] = 0;  
+            count=1;  
+        }     
+        else if(temp[i] > 0)  
+        {  
+            temp[i] = temp[i] - quant;  
+            sum = sum + quant;    
+        }  
+        if(temp[i]==0 && count==1)  
+        {  
+            y--;   
+            wt = wt+sum-at[i]-bt[i];  
+            tat = tat+sum-at[i];  
+            count =0;     
+        }  
+        if(i==NOP-1)                 i=0;  
+        else if(at[i+1]<=sum)        i++;  
+        else                         i=0;  
+ }  
+    avg_wt = wt * 1.0/NOP;  
+    avg_tat = tat * 1.0/NOP;  
+    printf("\n Average Turn Around Time: \t%f", avg_wt);  
+    printf("\n Average Waiting Time: \t%f", avg_tat);  
+}  
+
+
+
+-----------------------------------------------------------------------------------------Assignment 4A(Producer Consumer) ----------------------------------------------------------------------------------------------------------
+
+#include<stdio.h>
+#include<pthread.h>
+#include<semaphore.h>
+int buff[10];
+pthread_t pt,ct;
+pthread_mutex_t m;
+sem_t empty,full;
+void *producer( void *arg)
+{
+	int key,i=0;
+	while(1)
+	{
+		sem_wait(&full);
+		pthread_mutex_lock(&m);
+		key=random()%10;
+		buff[i]=key;
+		printf("\n %d element is added at location %d",key,i);
+		i++;
+		if(i==10) i=0;
+		pthread_mutex_unlock(&m);
+		sem_post(&empty);
+		sleep(1);
+		
+	}
+}
+void *consumer ( void *arg)
+{
+	int key,i;
+	while(1)
+	{	
+		sem_wait(&empty);
+		pthread_mutex_lock(&m);
+		key=buff[i++];
+		printf("\n %d element is extracted from location %d", key,i);
+		i++;
+		if(i==10 ) i=0;
+		pthread_mutex_unlock(&m);
+		sem_post(&full);
+		sleep(1);
+	}
+}
+int main()
+{
+	pthread_mutex_init(&m,NULL);
+	sem_init(&empty,0,0);
+	sem_init(&full,0,10);
+	pthread_create(&pt , NULL, producer,NULL);
+	pthread_create(&ct , NULL, consumer,NULL);
+	pthread_join(pt, NULL);
+	pthread_join(ct,NULL);
+	
+	return 0;
+}
+
+
+
+
+-----------------------------------------------------------------------------------------Assignment 4B(Dinning) ----------------------------------------------------------------------------------------------------------
+
+
+#include<stdio.h>
+#include<unistd.h>
+#include<pthread.h>
+#include<semaphore.h>
+pthread_t p[5];
+sem_t s[5];
+void *eating( void *args)
+{
+	int i=(int)args;
+	sem_wait(&s[i]);
+	sem_wait(&s[(i+1)%5]);
+	printf("\n %d Philosopher is eating",i);
+	sleep(1);
+	printf("\n %d Philosopher eating is over",i);
+	sem_post(&s[(i+1)%5]);
+	sem_post(&s[i]);
+
+}
+int main()
+{
+	int i;
+	for(i=0;i<5;i++)   sem_init(&s[i],0,1);
+	for(i=0;i<5;i++)   pthread_create(&p[i],NULL,eating,(void *) i);
+	for(i=0;i<5;i++)   pthread_join(p[i],NULL);
+	return 0;
+	
+}
+
+
+
+
+
+-----------------------------------------------------------------------------------------Assignment 5(Employer Database) ----------------------------------------------------------------------------------------------------------
+
+
+#include<stdio.h>
+int main(){
+    int max[10][10],nd[10][10],al[10][10],av[10],c[10],ss[10];
+    int p,r,i,j,pr,cn=0;
+    printf("Enter the number of process :");
+    scanf("%d",&p);
+    for(i=0;i<p;i++) c[i]=0;
+    printf("\n\nEnter the number of resources :");
+    scanf("%d",&r);
+    printf("\n\nEnter the max matrix for each process :");
+    for(i=0;i<p;i++){
+        printf("\nFor process %d:",i+1);
+        for(j=0;j<r;j++)  scanf("%d",&max[i][j]);
+    }
+    printf("\n\nEnter the allocation of each process :");
+    for(i=0;i<p;i++){
+        printf("\nFor process %d:",i+1);
+        for(j=0;j<r;j++)  scanf("%d",&al[i][j]);
+    }
+    printf("\n\nEnter the available resources :");
+    for(i=0;i<r;i++) scanf("%d",&av[i]);
+    for(i=0;i<p;i++)
+        for(j=0;j<r;j++)
+            nd[i][j]=max[i][j]-al[i][j];
+    do{
+        printf("\n Max Matrix:\tAllocation Matrix:\n");
+        for(i=0;i<p;i++){
+            for(j=0;j<r;j++) printf("%d",max[i][j]);
+            printf("\t\t");
+            for(j=0;j<r;j++) printf("%d",al[i][j]);
+            printf("\n");
+        }
+        pr=-1;
+        for(i=0;i<p;i++){
+            if(c[i]==0){
+                pr=i;
+                for(j=0;j<r;j++){
+                    if(av[j]<nd[i][j]){
+                        pr=-1;
+                        break;
+                    }
+                }
+            }
+            if(pr != -1) break;
+        }
+        if(pr!=-1){
+            printf("\nProcess %d runs to completion !",pr+1);
+            ss[cn]=pr+1;
+            cn++;
+            for(j=0;j<r;j++){
+                av[j] += al[pr][j];
+                al[pr][j]=0;
+                max[pr][j]=0;
+                c[pr]=1;
+            }
+        }
+    }while(cn != p && pr != -1);        
+    if(cn == p){
+        printf("\nThe system is in a safe state !!\n");
+        printf("Safe Sequence is ");
+        for(i=0;i<p;i++) printf("%d",ss[i]);
+    }
+    else
+        printf("\nThe system is in unsafe state!!");
+}
+
+
+
+
+---------------------------------------------------------------------------------------Assignment 6(Page Replacement Algorith) ----------------------------------------------------------------------------------------------------------
+
+
+
+#include<stdio.h>
+int n,nf,in[100],p[50],hit=0,i,j,k,pgfaultcnt=0;
+void getData(){
+	printf("\nEnter Length of page sequence :");
+	scanf("%d",&n);
+	printf("\nEnter the page reference sequence:");
+	for(i=0;i<n;i++)
+		scanf("%d",&in[i]);
+	printf("\Enter no of frames:");
+	scanf("%d",&nf);
+}
+void init(){
+	pgfaultcnt=0;
+	for(i=0;i<nf;i++) p[i]=9999;
+}
+int isHit( int data){
+	hit=0;
+	for(j=0;j<nf;j++){
+		if(p[j]==data){
+			hit=1;
+			break;
+		}
+		
+	}
+	return hit;
+}
+void disPages(){
+	for(k=0;k<nf;k++)
+		if(p[k]!=9999)
+		   printf("%d",p[k]);
+}
+void disPagefaultcnt(){
+	
+		   printf("\nTotal no of page faults:%d",pgfaultcnt);
+}
+void fifo(){
+	init();
+	for(i=0;i<n;i++){
+		printf("\nFor %d :",in[i]);
+		if(isHit(in[i])==0){
+			for(k=0;k<nf-1;k++)
+			  p[k]=p[k+1];
+			p[k]=in[i];
+			pgfaultcnt++;
+			disPages();
+		}
+		else
+		   printf("No page fault");
+	}
+	disPagefaultcnt();
+}
+
+void lru(){
+	init();
+	int least[50];
+	for(i=0;i<n;i++){
+		printf("\nFor %d :",in[i]);
+		if(isHit(in[i])==0){
+			for(j=0;j<nf;j++){
+			    int pg=p[j];
+			    int found=0;
+			    for(k=i-1;k>=0;k--){
+			        if(pg==in[k]){
+			            least[j]=k;
+			            found=1;
+			            break;
+			        }
+			        else
+			            found=0;
+			    }
+			    if(!found)
+			        least[j]=-9999;
+			}
+			int min=9999;
+			int repindex;
+			for(j=0;j<nf;j++){
+			     if(least[j]<min){
+			         min=least[j];
+			         repindex=j;
+			     }
+			}
+			p[repindex]=in[i];
+			pgfaultcnt++;
+			disPages();
+		}
+		else
+		   printf("No page fault");
+	}
+	disPagefaultcnt();
+}
+void optimal(){
+	init();
+	int next[50];
+	for(i=0;i<n;i++){
+		printf("\nFor %d :",in[i]);
+		if(isHit(in[i])==0){
+			for(j=0;j<nf;j++){
+			    int pg=p[j];
+			    int found=0;
+			    for(k=i;k<n;k++){
+			        if(pg==in[k]){
+			            next[j]=k;
+			            found=1;
+			            break;
+			        }
+			        else
+			            found=0;
+			    }
+			    if(!found)
+			        next[j]=9999;
+			}
+			int max=-9999;
+			int repindex;
+			for(j=0;j<nf;j++){
+			     if(next[j]>max){
+			         max=next[j];
+			         repindex=j;
+			     }
+			}
+			p[repindex]=in[i];
+			pgfaultcnt++;
+			disPages();
+		}
+		else
+		   printf("No page fault");
+	}
+	disPagefaultcnt();
+}
+
+int main(){
+	int option;
+	while(1){
+		printf("\n Page replacement algo \n1.Enter values\n2.FIFO\n3.Optimal\n4.LRU\n\n5.Exit\nChoose an option:");
+		scanf("%d",&option);
+		switch(option)
+		{
+			case 1:
+			   getData();
+			   break;
+			case 2:
+			   fifo();
+			   break;
+			case 3:
+			   optimal();
+			   break;
+			case 4:
+			   lru();
+			   break;
+			default:
+			   return 0;
+			   break;
+		}
+	}
+}
+	
+	
+
+
+-----------------------------------------------------------------------------------------Assignment 7A(Client Server)-------------------------------------------------------------------
+
+Client:-
+
+#include<stdio.h>
+#include<string.h>
+#include<fcntl.h>
+#include<unistd.h>
+#define FIFO_PIPE "xyz"
+int main()
+{
+	int fd, i=0;
+	char str[200],ch;
+	mkfifo(FIFO_PIPE, 0644);    // Pipe created	
+	printf("\n Pipe Successfully created \n");
+	printf("\n Enter Your message (press @ to terminate) \n");
+	while((ch=fgetc(stdin)) != '@')
+	{
+		str[i++] = ch;
+	}
+	str[i]='\0'; // Null character at the end 
+	fd=open(FIFO_PIPE,O_WRONLY); // Open the pipe
+	write(fd, str, strlen(str)); // write into the pipe
+	close(fd);
+	return 0;
+}
+
+
+Server:-
+
+#include<unistd.h>
+#include<stdlib.h>
+#include<stdio.h>
+#include<string.h>
+#include<sys/shm.h>
+#include "head.h"
+int main()
+{
+	void *shared_memory= (void *)0;
+	struct shared_m *shared_stuff;
+	char buffer[2048];
+	int shmid;
+	shmid= shmget((key_t)1234, sizeof(struct shared_m), 0666 | IPC_CREAT);
+	shared_memory = shmat(shmid, (void *)0,0);
+	shared_stuff = (struct shared_m*)shared_memory;
+	while(1)
+	{
+		while(shared_stuff->flag == 1) sleep(1);
+		printf("enter some text : ");
+		fgets(buffer, 2048, stdin);
+		strncpy(shared_stuff->text, buffer,2048);
+		shared_stuff->flag=1;
+		if(strncmp(buffer,"end",3)==0)  exit(0);
+	}
+}
+
+
+
+
+
+-----------------------------------------------------------------------------------------Assignment 7B(P1 and P2)-------------------------------------------------------------------
+
+
+P1:-
+
+#include<stdio.h>
+#include<string.h>
+#include<fcntl.h>
+#include<unistd.h>
+#define FIFO_PIPE "xyz"
+int main()
+{
+	int fd, i, c=0,w=0,l=0;
+	char str[100];
+	
+	fd=open(FIFO_PIPE, O_RDONLY);
+	read(fd, str, sizeof(str));
+	
+	for(i=0; str[i]!='\0';i++)
+	{
+		if(str[i]==' ' || str[i] == '\n')  w++;
+		if(str[i] =='\n')  l++;
+		c++;
+	}
+	printf("\n Number of characters = %d", c);
+	printf("\n Number of words = %d", w+1);
+	printf("\n Number of lines = %d", l+1);
+	
+	close(fd);
+	return 0;
+}
+
+
+
+
+P2:-
+
+#include<stdio.h>
+#include<string.h>
+#include<fcntl.h>
+#include<unistd.h>
+#define FIFO_PIPE "xyz"
+int main(){
+	int fd, i=0;
+	char str[200], ch;
+	mkfifo(FIFO_PIPE, 0644);
+	printf("\n Enter your message (press @ to terminate )\n");
+	while((ch=fgetc(stdin)) != '@')
+	{
+		str[i++]=ch;
+	}
+	str[i]='\0';
+	fd=open(FIFO_PIPE, O_WRONLY);
+	write(fd, str, strlen(str));
+	close(fd);
+	return 0;
+}
+
+
+
+
+-----------------------------------------------------------------------------------------Assignment 8(Disk Scheduling)-------------------------------------------------------------------
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int RQ[100], n, initial;
+
+void getData() {
+    printf("Enter the number of Requests\n");
+    scanf("%d", &n);
+    printf("Enter the Requests sequence\n");
+    for (int i = 0; i < n; i++)
+        scanf("%d", &RQ[i]);
+    printf("Enter initial head position\n");
+    scanf("%d", &initial);
+}
+
+void sstf() {
+    int localRQ[100], localInitial = initial, localCount = 0, localTotalHeadMovement = 0;
+
+    // Copy RQ[] to localRQ[]
+    for (int i = 0; i < n; i++)
+        localRQ[i] = RQ[i];
+
+    while (localCount != n) {
+        int min = 1000, d, index = -1;
+        for (int i = 0; i < n; i++) {
+            d = abs(localRQ[i] - localInitial);
+            if (min > d) {
+                min = d;
+                index = i;
+            }
+        }
+        if (index == -1)
+            break;
+
+        localTotalHeadMovement += min;
+        localInitial = localRQ[index];
+        localRQ[index] = 1000;
+        localCount++;
+    }
+
+    printf("Total head movement is %d\n", localTotalHeadMovement);
+}
+
+void scan() {
+    int size, move, i, j;
+    int TotalHeadMoment = 0;
+    int localRQ[100], localInitial = initial;
+
+    printf("Enter total disk size\n");
+    scanf("%d", &size);
+    printf("Enter the head movement direction for high 1 and for low 0\n");
+    scanf("%d", &move);
+
+    // Copy RQ[] to localRQ[]
+    for (i = 0; i < n; i++)
+        localRQ[i] = RQ[i];
+
+    // Sort localRQ[]
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n - i - 1; j++) {
+            if (localRQ[j] > localRQ[j + 1]) {
+                int temp = localRQ[j];
+                localRQ[j] = localRQ[j + 1];
+                localRQ[j + 1] = temp;
+            }
+        }
+    }
+
+    int index = -1;
+    for (i = 0; i < n; i++) {
+        if (localInitial < localRQ[i]) {
+            index = i;
+            break;
+        }
+    }
+    if (index == -1)
+        index = n;
+
+    if (move == 1) {
+        for (i = index; i < n; i++) {
+            TotalHeadMoment += abs(localRQ[i] - localInitial);
+            localInitial = localRQ[i];
+        }
+        TotalHeadMoment += abs(size - localInitial - 1);
+        localInitial = size - 1;
+        for (i = index - 1; i >= 0; i--) {
+            TotalHeadMoment += abs(localRQ[i] - localInitial);
+            localInitial = localRQ[i];
+        }
+    } else {
+        for (i = index - 1; i >= 0; i--) {
+            TotalHeadMoment += abs(localRQ[i] - localInitial);
+            localInitial = localRQ[i];
+        }
+        TotalHeadMoment += abs(localInitial - 0);
+        localInitial = 0;
+        for (i = index; i < n; i++) {
+            TotalHeadMoment += abs(localRQ[i] - localInitial);
+            localInitial = localRQ[i];
+        }
+    }
+
+    printf("Total head movement is %d\n", TotalHeadMoment);
+}
+
+void clook() {
+    int size, move, i, j;
+    int TotalHeadMoment = 0;
+    int localRQ[100], localInitial = initial;
+
+    printf("Enter total disk size\n");
+    scanf("%d", &size);
+    printf("Enter the head movement direction for high 1 and for low 0\n");
+    scanf("%d", &move);
+
+    // Copy RQ[] to localRQ[]
+    for (i = 0; i < n; i++)
+        localRQ[i] = RQ[i];
+
+    // Sort localRQ[]
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n - i - 1; j++) {
+            if (localRQ[j] > localRQ[j + 1]) {
+                int temp = localRQ[j];
+                localRQ[j] = localRQ[j + 1];
+                localRQ[j + 1] = temp;
+            }
+        }
+    }
+
+    int index = -1;
+    for (i = 0; i < n; i++) {
+        if (localInitial < localRQ[i]) {
+            index = i;
+            break;
+        }
+    }
+    if (index == -1)
+        index = 0;
+
+    if (move == 1) {
+        for (i = index; i < n; i++) {
+            TotalHeadMoment += abs(localRQ[i] - localInitial);
+            localInitial = localRQ[i];
+        }
+        for (i = 0; i < index; i++) {
+            TotalHeadMoment += abs(localRQ[i] - localInitial);
+            localInitial = localRQ[i];
+        }
+    } else {
+        for (i = index - 1; i >= 0; i--) {
+            TotalHeadMoment += abs(localRQ[i] - localInitial);
+            localInitial = localRQ[i];
+        }
+        for (i = n - 1; i >= index; i--) {
+            TotalHeadMoment += abs(localRQ[i] - localInitial);
+            localInitial = localRQ[i];
+        }
+    }
+
+    printf("Total head movement is %d\n", TotalHeadMoment);
+}
+
+int main() {
+    int choice;
+    while (1) {
+        printf("\nDisk Scheduling Algorithms\n1. Enter data\n2. SSTF\n3. SCAN\n4. C-LOOK\n5. Exit\nEnter your choice: ");
+        scanf("%d", &choice);
+        switch (choice) {
+            case 1:
+                getData();
+                break;
+            case 2:
+                sstf();
+                break;
+            case 3:
+                scan();
+                break;
+            case 4:
+                clook();
+                break;
+            case 5:
+                return 0;
+            default:
+                printf("Invalid choice!\n");
+                break;
+        }
+    }
+}
+
+
+
+
+
+
+
+
